@@ -28,7 +28,7 @@ app.get('/todos', (req, res) => {
 
 // GET /todos/:id
 app.get('/todos/:id', (req, res) => {    
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id, 10);
 
     todos.forEach(todo => {
         if (todo.id === id) {
