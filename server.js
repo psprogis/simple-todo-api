@@ -32,17 +32,19 @@ app.get('/todos/:id', (req, res) => {
 });
 
 app.post('/todos', (req, res) => {
-    const body = req.body;
+    const todo = _.pick(req.body, 'completed', 'description');
 
-    if (!_.isBoolean(body.completed)
-            || !_.isString(body.description)
-            || body.description.trim().length === 0) {
+    todo.description = todo.description.trim();
+
+    if (!_.isBoolean(todo.completed)
+            || !_.isString(todo.description)
+            || todo.description.length === 0) {
         return res.status(400).send();
     }
 
-    todos.push(Object.assign({id: todoNextId++}, body));
+    todos.push(Object.assign({id: todoNextId++}, todo));
     
-    res.json(body);
+    res.json(todo);
 });
 
 app.listen(PORT, () => {
