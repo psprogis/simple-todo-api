@@ -5,7 +5,7 @@ const _ = require('underscore');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const todos = [];
+let todos = [];
 let todoNextId = 1;
 
 app.use(bodyParser.json());
@@ -22,7 +22,7 @@ app.get('/todos', (req, res) => {
 // GET /todos/:id
 app.get('/todos/:id', (req, res) => {    
     const id = parseInt(req.params.id, 10);
-    const matchedTodo = _.findWhere(todos, {id})
+    const matchedTodo = _.findWhere(todos, {id});
 
     if (matchedTodo) {
         res.json(matchedTodo);
@@ -45,6 +45,18 @@ app.post('/todos', (req, res) => {
     todos.push(Object.assign({id: todoNextId++}, todo));
     
     res.json(todo);
+});
+
+app.delete('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const matchedTodo = _.findWhere(todos, {id});
+
+    if (!matchedTodo) {
+        res.status(404).json({'error': 'no todo found with passed id'});
+    } else {
+        todos = _.without(todos, matchedTodo);
+        res.json(matchedTodo);
+    }
 });
 
 app.listen(PORT, () => {
