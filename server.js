@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
     res.send('TODO API root');
 });
 
-// GET /todos?completed=true
+// GET /todos?completed=true&q=work
 app.get('/todos', (req, res) => {
     const queryParams = req.query;
     const searchCriteria = {};
@@ -23,13 +23,19 @@ app.get('/todos', (req, res) => {
         searchCriteria.completed = queryParams.completed === 'true' ? true : false;
     }
 
-    const matchedTodos = _.where(todos, searchCriteria);
-    
+    let matchedTodos = _.where(todos, searchCriteria);
+
+    if (queryParams.hasOwnProperty('q')) {
+        console.log(`searching for ${queryParams.q}`);
+
+        matchedTodos = matchedTodos.filter(item => item.description.includes(queryParams.q));
+    }
+
     res.json(matchedTodos);
 });
 
 // GET /todos/:id
-app.get('/todos/:id', (req, res) => {    
+app.get('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
     const matchedTodo = _.findWhere(todos, {id});
 
@@ -52,7 +58,7 @@ app.post('/todos', (req, res) => {
     }
 
     todos.push(Object.assign({id: todoNextId++}, todo));
-    
+
     res.json(todo);
 });
 
@@ -86,7 +92,7 @@ app.put('/todos/:id', (req, res) => {
         // do nothing
     }
 
-    if (todo.hasOwnProperty('description') 
+    if (todo.hasOwnProperty('description')
             && _.isString(todo.description)
             && todo.description.trin().length !== 0) {
         validAttrs.description = todo.description;
@@ -95,10 +101,10 @@ app.put('/todos/:id', (req, res) => {
     } else {
         // do nothing
     }
-    
+
     matchedTodo = _.extend(matchedTodo, validAttrs);
 
-    res.json(todo); 
+    res.json(todo);
 });
 
 app.listen(PORT, () => {
