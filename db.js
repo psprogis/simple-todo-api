@@ -1,8 +1,17 @@
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize(null, null, null, {
-    dialect: 'sqlite',
-    storage: `${__dirname}/data/dev-todo-api.sqlite`
-});
+const Sequelize = require("sequelize");
+const env = process.env.NODE_ENV || "development";
+let sequelize;
+
+if (env === "production") {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+        dialect: "postgres"
+    });
+} else {
+    sequelize = new Sequelize(null, null, null, {
+        dialect: 'sqlite',
+        storage: `${__dirname}/data/dev-todo-api.sqlite`
+    });
+}
 
 const db = {};
 
