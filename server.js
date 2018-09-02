@@ -36,14 +36,19 @@ app.get('/todos', (req, res) => {
 });
 
 // GET /todos/:id
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    const matchedTodo = _.findWhere(todos, {id});
 
-    if (matchedTodo) {
-        res.json(matchedTodo);
-    } else {
-        res.status(404).send();
+    try {
+        const matchedTodo = await db.todo.findById(id);
+
+        if (matchedTodo) {
+            res.json(matchedTodo.toJSON());
+        } else {
+            res.status(404).send();
+        }
+    } catch (e) {
+        res.status(500).send();
     }
 });
 
