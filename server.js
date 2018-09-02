@@ -16,23 +16,27 @@ app.get('/', (req, res) => {
 });
 
 // GET /todos?completed=true&q=work
-app.get('/todos', (req, res) => {
-    const queryParams = req.query;
-    const searchCriteria = {};
+app.get('/todos', async (req, res) => {
+    const query = req.query;
+    const where = {};
 
-    if (queryParams.hasOwnProperty('completed')) {
-        searchCriteria.completed = queryParams.completed === 'true' ? true : false;
+    if (query.hasOwnProperty('completed')) {
+        where.completed = query.completed === 'true' ? true : false;
     }
 
-    let matchedTodos = _.where(todos, searchCriteria);
-
-    if (queryParams.hasOwnProperty('q')) {
-        console.log(`searching for ${queryParams.q}`);
-
-        matchedTodos = matchedTodos.filter(item => item.description.includes(queryParams.q));
+    if (query.hasOwnProperty('q')) {
+        where.description = {
+            $like: `%${query.q}%`
+        }
     }
 
-    res.json(matchedTodos);
+    try {
+        const matchedTodos = await db.todo.findAll({where});
+
+        res.json(matchedTodos);
+    } catch (e) {
+        res.status(500).send();
+    }
 });
 
 // GET /todos/:id
