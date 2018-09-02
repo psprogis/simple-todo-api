@@ -68,15 +68,20 @@ app.post('/todos', async (req, res) => {
     }
 });
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    const matchedTodo = _.findWhere(todos, {id});
 
-    if (!matchedTodo) {
-        res.status(404).json({'error': 'no todo found with passed id'});
-    } else {
-        todos = _.without(todos, matchedTodo);
-        res.json(matchedTodo);
+    try {
+        const rowsDeleted = await db.todo.destroy({where: {id}});
+
+        if (rowsDeleted === 0) {
+            res.status(404).json({'error': 'no todo found with passed id'});
+        } else {
+            res.status(204).send();
+        }
+
+    } catch (e) {
+        res.status(500).send();
     }
 });
 
