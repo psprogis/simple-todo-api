@@ -6,8 +6,7 @@ const db = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-let todos = [];
-let todoNextId = 1;
+const todos = [];
 
 app.use(bodyParser.json());
 
@@ -17,7 +16,7 @@ app.get('/', (req, res) => {
 
 // GET /todos?completed=true&q=work
 app.get('/todos', async (req, res) => {
-    const query = req.query;
+    const { query } = req;
     const where = {};
 
     if (query.hasOwnProperty('completed')) {
@@ -26,12 +25,12 @@ app.get('/todos', async (req, res) => {
 
     if (query.hasOwnProperty('q')) {
         where.description = {
-            $like: `%${query.q}%`
-        }
+            $like: `%${query.q}%`,
+        };
     }
 
     try {
-        const matchedTodos = await db.todo.findAll({where});
+        const matchedTodos = await db.todo.findAll({ where });
 
         res.json(matchedTodos);
     } catch (e) {
@@ -75,7 +74,7 @@ app.delete('/todos/:id', async (req, res) => {
         const rowsDeleted = await db.todo.destroy({where: {id}});
 
         if (rowsDeleted === 0) {
-            res.status(404).json({'error': 'no todo found with passed id'});
+            res.status(404).json({ error: 'no todo found with passed id' });
         } else {
             res.status(204).send();
         }
