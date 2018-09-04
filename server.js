@@ -6,8 +6,6 @@ const db = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const todos = [];
-
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
@@ -71,7 +69,7 @@ app.delete('/todos/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     try {
-        const rowsDeleted = await db.todo.destroy({where: {id}});
+        const rowsDeleted = await db.todo.destroy({ where: { id } });
 
         if (rowsDeleted === 0) {
             res.status(404).json({ error: 'no todo found with passed id' });
@@ -114,6 +112,18 @@ app.put('/todos/:id', async (req, res) => {
         }
     } catch (e) {
         res.status(500).send();
+    }
+});
+
+app.post('/users', async (req, res) => {
+    const user = _.pick(req.body, 'email', 'password');
+
+    try {
+        const result = await db.user.create(user);
+
+        res.json(result.toJSON());
+    } catch (e) {
+        res.status(400).json(e);
     }
 });
 
