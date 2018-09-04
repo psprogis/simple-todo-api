@@ -121,7 +121,7 @@ app.post('/users', async (req, res) => {
     try {
         const result = await db.user.create(user);
 
-        res.json(result.toJSON());
+        res.json(result.toPublicJSON());
     } catch (e) {
         res.status(400).json(e);
     }
