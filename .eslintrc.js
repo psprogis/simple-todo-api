@@ -20,6 +20,7 @@ module.exports = {
         'class-methods-use-this': 'off',
         'arrow-parens': 'off',
         'no-plusplus': 'off',
-        'no-prototype-builtins': 'warn'
+        'no-prototype-builtins': 'warn',
+        'func-names': 'warn',
     },
 };
