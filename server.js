@@ -142,11 +142,11 @@ app.post('/users/login', async (req, res) => {
             },
         });
 
-        if (!result || !bcrypt.compareSync(user.password, user.get('password_hash'))) {
+        if (!result || !bcrypt.compareSync(user.password, result.get('password_hash'))) {
             return res.status(401).send();
         }
 
-        res.json(user.toPublicJSON());
+        res.json(result.toPublicJSON());
     } catch (e) {
         res.status(500).json(e);
     }
