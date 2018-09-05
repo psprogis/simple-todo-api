@@ -47,5 +47,28 @@ module.exports = (sequelize, DataTypes) => {
 
         return _.pick(json, 'id', 'email', 'createdAt', 'updatedAt');
     };
+
+    User.authenticate = async function(user) {
+        if (typeof user.email !== 'string' || typeof user.password !== 'string') {
+            return Promise.reject();
+        }
+
+        try {
+            const result = await User.findOne({
+                where: {
+                    email: user.email,
+                },
+            });
+
+            if (!result || !bcrypt.compareSync(user.password, result.get('password_hash'))) {
+                return Promise.reject();
+            }
+
+            return Promise.resolve(result);
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    }
+
     return User;
 };

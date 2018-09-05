@@ -131,28 +131,16 @@ app.post('/users', async (req, res) => {
 app.post('/users/login', async (req, res) => {
     const user = _.pick(req.body, 'email', 'password');
 
-    if (typeof user.email !== 'string' || typeof user.password !== 'string') {
-        return res.status(400).send();
-    }
-
     try {
-        const result = await db.user.findOne({
-            where: {
-                email: user.email,
-            },
-        });
-
-        if (!result || !bcrypt.compareSync(user.password, result.get('password_hash'))) {
-            return res.status(401).send();
-        }
+        const result = await db.user.authenticate(user);
 
         res.json(result.toPublicJSON());
     } catch (e) {
-        res.status(500).json(e);
+        res.status(401).send();
     }
 });
 
-db.sequelize.sync()
+db.sequelize.sync({force: true})
     .then(() => {
         app.listen(PORT, () => {
             console.log(`express listening on port ${PORT}`);
