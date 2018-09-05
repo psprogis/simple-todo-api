@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('underscore');
+const bcrypt = require('bcrypt');
 const db = require('./db');
 
 const app = express();
@@ -124,6 +125,30 @@ app.post('/users', async (req, res) => {
         res.json(result.toPublicJSON());
     } catch (e) {
         res.status(400).json(e);
+    }
+});
+
+app.post('/users/login', async (req, res) => {
+    const user = _.pick(req.body, 'email', 'password');
+
+    if (typeof user.email !== 'string' || typeof user.password !== 'string') {
+        return res.status(400).send();
+    }
+
+    try {
+        const result = await db.user.findOne({
+            where: {
+                email: user.email,
+            },
+        });
+
+        if (!result || !bcrypt.compareSync(user.password, user.get('password_hash'))) {
+            return res.status(401).send();
+        }
+
+        res.json(user.toPublicJSON());
+    } catch (e) {
+        res.status(500).json(e);
     }
 });
 
