@@ -21,6 +21,6 @@ module.exports = {
         'arrow-parens': 'off',
         'no-plusplus': 'off',
         'no-prototype-builtins': 'warn',
-        'func-names': 'warn',
+        'func-names': 'off',
     },
 };

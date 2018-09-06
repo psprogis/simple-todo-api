@@ -133,14 +133,20 @@ app.post('/users/login', async (req, res) => {
 
     try {
         const result = await db.user.authenticate(user);
+        const token = db.user.generateToken('authentication');
 
-        res.json(result.toPublicJSON());
+        if (token) {
+            res.header('Auth', token).json(result.toPublicJSON());
+        } else {
+            res.status(401).send();
+        }
+
     } catch (e) {
         res.status(401).send();
     }
 });
 
-db.sequelize.sync({force: true})
+db.sequelize.sync()
     .then(() => {
         app.listen(PORT, () => {
             console.log(`express listening on port ${PORT}`);
