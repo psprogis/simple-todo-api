@@ -50,6 +50,56 @@ module.exports = (sequelize, DataTypes) => {
         return _.pick(json, 'id', 'email', 'createdAt', 'updatedAt');
     };
 
+    User.prototype.generateToken = function (type) {
+        if (!_.isString(type)) {
+            return;
+        }
+
+        try {
+            const stringData = JSON.stringify({
+                id: this.get('id'),
+                type,
+            });
+
+            const encryptedData = crypto.AES.encrypt(stringData, 'abc123!@#!').toString();
+
+            const token = jwt.sign({
+                token: encryptedData,
+            }, 'qwerty098');
+
+            return token;
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+    };
+
+    User.findByToken = async function (token) {
+        try {
+            const decodedJWT = jwt.verify(token, 'qwerty098');
+            const bytes = crypto.AES.decrypt(decodedJWT.token, 'abc123!@#!');
+            const tokenData = JSON.parse(bytes.toString(crypto.enc.Utf8));
+
+            try {
+                const result = await User.findById(tokenData.id);
+
+                if (result) {
+                    return Promise.resolve(result);
+                } else {
+                    console.error('user was not found');
+                    return Promise.reject();
+                }
+            } catch (e) {
+                console.error(e);
+                return Promise.reject(e);
+            }
+
+        } catch (e) {
+            console.error(e);
+            return Promise.reject(e);
+        }
+    };
+
     User.authenticate = async function (user) {
         if (typeof user.email !== 'string' || typeof user.password !== 'string') {
             return Promise.reject();
@@ -70,31 +120,7 @@ module.exports = (sequelize, DataTypes) => {
         } catch (e) {
             return Promise.reject(e);
         }
-    }
-
-    User.generateToken = function (type) {
-        if (!_.isString(type)) {
-            return;
-        }
-
-        try {
-            const stringData = JSON.stringify({
-                id: this.id,
-                type,
-            });
-
-            const encryptedData = crypto.AES.encrypt(stringData, 'abc123!@#!').toString();
-
-            const token = jwt.sign({
-                token: encryptedData,
-            }, 'qwerty098');
-
-            return token;
-        } catch (e) {
-            console.error(e);
-            return;
-        }
-    }
+    };
 
     return User;
 };

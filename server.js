@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const _ = require('underscore');
 const bcrypt = require('bcrypt');
 const db = require('./db');
+const middleware = require('./middleware')(db);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +15,7 @@ app.get('/', (req, res) => {
 });
 
 // GET /todos?completed=true&q=work
-app.get('/todos', async (req, res) => {
+app.get('/todos', middleware.requireAuthentication, async (req, res) => {
     const { query } = req;
     const where = {};
 
@@ -38,7 +39,7 @@ app.get('/todos', async (req, res) => {
 });
 
 // GET /todos/:id
-app.get('/todos/:id', async (req, res) => {
+app.get('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     try {
@@ -54,7 +55,7 @@ app.get('/todos/:id', async (req, res) => {
     }
 });
 
-app.post('/todos', async (req, res) => {
+app.post('/todos', middleware.requireAuthentication, async (req, res) => {
     const todo = _.pick(req.body, 'completed', 'description');
 
     try {
@@ -66,7 +67,7 @@ app.post('/todos', async (req, res) => {
     }
 });
 
-app.delete('/todos/:id', async (req, res) => {
+app.delete('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     try {
@@ -83,7 +84,7 @@ app.delete('/todos/:id', async (req, res) => {
     }
 });
 
-app.put('/todos/:id', async (req, res) => {
+app.put('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const todo = _.pick(req.body, 'completed', 'description');
     const id = parseInt(req.params.id, 10);
     const attributes = {};
@@ -133,7 +134,7 @@ app.post('/users/login', async (req, res) => {
 
     try {
         const result = await db.user.authenticate(user);
-        const token = db.user.generateToken('authentication');
+        const token = result.generateToken('authentication');
 
         if (token) {
             res.header('Auth', token).json(result.toPublicJSON());
@@ -142,6 +143,7 @@ app.post('/users/login', async (req, res) => {
         }
 
     } catch (e) {
+        console.error(e);
         res.status(401).send();
     }
 });
