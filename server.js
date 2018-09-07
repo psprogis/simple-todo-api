@@ -17,7 +17,9 @@ app.get('/', (req, res) => {
 // GET /todos?completed=true&q=work
 app.get('/todos', middleware.requireAuthentication, async (req, res) => {
     const { query } = req;
-    const where = {};
+    const where = {
+        userId: req.user.get('id'),
+    };
 
     if (query.hasOwnProperty('completed')) {
         where.completed = query.completed === 'true' ? true : false;
@@ -43,7 +45,12 @@ app.get('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     try {
-        const matchedTodo = await db.todo.findById(id);
+        const matchedTodo = await db.todo.findOne({
+            where: {
+                id,
+                userId: req.user.get('id'),
+            }
+        });
 
         if (matchedTodo) {
             res.json(matchedTodo.toJSON());
@@ -74,7 +81,12 @@ app.delete('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     try {
-        const rowsDeleted = await db.todo.destroy({ where: { id } });
+        const rowsDeleted = await db.todo.destroy({
+            where: {
+                id,
+                userId: req.user.get('id'),
+            }
+        });
 
         if (rowsDeleted === 0) {
             res.status(404).json({ error: 'no todo found with passed id' });
@@ -101,7 +113,12 @@ app.put('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     }
 
     try {
-        const updateTodo = await db.todo.findById(id);
+        const updateTodo = await db.todo.findOne({
+            where: {
+                id,
+                userId: req.user.get('id'),
+            }
+        });
 
         if (updateTodo) {
             try {
