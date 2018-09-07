@@ -61,6 +61,9 @@ app.post('/todos', middleware.requireAuthentication, async (req, res) => {
     try {
         const result = await db.todo.create(todo);
 
+        await req.user.addTodo(result);
+        await result.reload();
+
         res.json(result.toJSON());
     } catch (e) {
         res.status(400).json(e);
@@ -148,7 +151,7 @@ app.post('/users/login', async (req, res) => {
     }
 });
 
-db.sequelize.sync()
+db.sequelize.sync({force: true})
     .then(() => {
         app.listen(PORT, () => {
             console.log(`express listening on port ${PORT}`);
