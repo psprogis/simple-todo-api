@@ -153,14 +153,14 @@ app.post('/users/login', async (req, res) => {
     const user = _.pick(req.body, 'email', 'password');
 
     try {
-        const result = await db.user.authenticate(user);
-        const token = result.generateToken('authentication');
+        const userInstance = await db.user.authenticate(user);
+        const token = userInstance.generateToken('authentication');
 
-        if (token) {
-            res.header('Auth', token).json(result.toPublicJSON());
-        } else {
-            res.status(401).send();
-        }
+        const tokenInstance = await db.token.create({
+            token,
+        });
+
+        res.header('Auth', tokenInstance.get('token')).json(userInstance.toPublicJSON());
 
     } catch (e) {
         console.error(e);
