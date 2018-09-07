@@ -168,6 +168,15 @@ app.post('/users/login', async (req, res) => {
     }
 });
 
+app.delete('/users/login', middleware.requireAuthentication, async (req, res) => {
+    try {
+        await req.token.destroy();
+        res.status(204).send();
+    } catch (e) {
+        res.status(500).send();
+    }
+});
+
 db.sequelize.sync({force: true})
     .then(() => {
         app.listen(PORT, () => {
