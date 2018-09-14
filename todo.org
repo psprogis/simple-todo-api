@@ -1,0 +1,3 @@
+* list of items to do:
+  - ! add tests before refactoring
+  - ? move server.js to server folder, db.js to server/db folder, models to server/models
