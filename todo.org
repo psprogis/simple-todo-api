@@ -1,3 +1,5 @@
 * list of items to do:
   - ! add tests before refactoring
+  - ! add README.md file
   - ? move server.js to server folder, db.js to server/db folder, models to server/models
+  - refactor dependencies, some should be moved to dev section
