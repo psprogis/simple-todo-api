@@ -91,7 +91,7 @@ app.delete('/todos/:id', middleware.requireAuthentication, async (req, res) => {
         if (rowsDeleted === 0) {
             res.status(404).json({ error: 'no todo found with passed id' });
         } else {
-            res.status(204).send();
+            res.status(204).send();  // TODO: send deleted item
         }
 
     } catch (e) {
@@ -99,6 +99,7 @@ app.delete('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     }
 });
 
+// TODO: use patch instead ?
 app.put('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const todo = _.pick(req.body, 'completed', 'description');
     const id = parseInt(req.params.id, 10);
@@ -177,9 +178,8 @@ app.delete('/users/login', middleware.requireAuthentication, async (req, res) =>
     }
 });
 
-db.sequelize.sync({force: true})
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`express listening on port ${PORT}`);
-        });
-    });
+app.listen(PORT, () => {
+    console.log(`express listening on port ${PORT}`);
+});
+
+module.exports.app = app;
