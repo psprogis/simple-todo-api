@@ -2,57 +2,78 @@ const expect = require('expect');
 const request = require('supertest');
 
 const { app } = require('../server');
-const Todo = require('../models/todo');
 const db = require('../db');
 
-// describe('GET /todos', () => {
-//     // before(async () => {
-//     //     request(app).get
-//     // })
-//
-//     it('should return empty list if no todos in database', (done) => {
-//         request(app)
-//             .post('/users/login')
-//             .expect(res => {
-//                 console.log(res.status)
-//             })
-//             .end(done);
-//     });
-// });
+before(async () => {
+    await db.sequelize.sync({force: true});
 
-// beforeEach((done) => {
-//     // Todo.remove({}).then - sync: true should work
-// });
+    const userInstance = await db.user.create({
+        email: 'test@gmail.com',
+        password: '123HFklsdfa',
+    });
+
+    const token = userInstance.generateToken('authentication');
+
+    const tokenInstance = await db.token.create({ token });
+
+    this.tokenStr = tokenInstance.get('token');
+
+    await db.todo.create({
+        description: 'do something',
+        completed: false,
+        userId: 1
+    });
+});
+
+describe('GET /todos', () => {
+    it('should get all todos', (done) => {
+        request(app)
+            .get('/todos')
+            .set('Auth', this.tokenStr)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.length).toBe(1);
+            })
+            .end(done);
+    });
+});
 
 describe('POST /todos', () => {
-    it.skip('should create a new todo', (done) => {
-        const text = 'test todo text';
+    it('should create a new todo', (done) => {
+        const description = 'test todo text';
 
         request(app)
             .post('/todos')
+            .set('Auth', this.tokenStr)
             .send({
-                text
+                description
             })
+
             .expect(200)
             .expect(res => {
-                expect(res.body.text).toBe(text);
+                console.log(res.body);
+                expect(res.body.description).toBe(description);
             })
             .end((err, res) => {
                 if (err) {
                     return done(err);
                 }
 
-                Todo.find()
+                db.todo.findAll({
+                    where: {
+                        userId: 1
+                    }
+                })
                     .then(todos => {
-                        expect(todos.length).toBe(1);
-                        expect(todos[0].text).toBe(text);
+                        expect(todos.length).toBe(2);
+                        expect(todos[1].description).toBe('abc');
                         done();
                     })
                     .catch(err => done(err));
             });
     });
 
-    it('should not create todo with invalid body data', (done) => {
+    it.skip('should not create todo with invalid body data', (done) => {
         request(app)
             .post('/todos')
             .send({})
@@ -71,3 +92,5 @@ describe('POST /todos', () => {
             });
     });
 });
+
+
