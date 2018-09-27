@@ -3,3 +3,8 @@
   - ! add README.md file
   - ? move server.js to server folder, db.js to server/db folder, models to server/models
   - refactor dependencies, some should be moved to dev section
+  - generate unique ids (uuid)
+  - use lodash instead of underscore
+  - and start script, engines for heroku
+  - ? use validator module
+  - use jsonwebtoken

@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
         return _.pick(json, 'id', 'email', 'createdAt', 'updatedAt');
     };
 
+    // TODO: use correct secret value, remove hardcoded one
     User.prototype.generateToken = function (type) {
         if (!_.isString(type)) {
             return;
