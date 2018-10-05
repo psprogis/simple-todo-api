@@ -4,6 +4,19 @@ const request = require('supertest');
 const { app } = require('../server');
 const db = require('../db');
 
+const initialTodos = [
+    {
+        description: 'first todo item',
+        completed: false,
+        userId: 1
+    },
+    {
+        description: 'second todo item',
+        completed: true,
+        userId: 1
+    }
+];
+
 before(async () => {
     await db.sequelize.sync({force: true});
 
@@ -18,11 +31,7 @@ before(async () => {
 
     this.tokenStr = tokenInstance.get('token');
 
-    await db.todo.create({
-        description: 'do something',
-        completed: false,
-        userId: 1
-    });
+    initialTodos.forEach(async todo => await db.todo.create(todo));
 });
 
 describe('GET /todos', () => {
@@ -32,7 +41,7 @@ describe('GET /todos', () => {
             .set('Auth', this.tokenStr)
             .expect(200)
             .expect(res => {
-                expect(res.body.length).toBe(1);
+                expect(res.body.length).toBe(initialTodos.length);
             })
             .end(done);
     });
@@ -65,17 +74,18 @@ describe('POST /todos', () => {
                     }
                 })
                     .then(todos => {
-                        expect(todos.length).toBe(2);
-                        expect(todos[1].description).toBe('abc');
+                        expect(todos.length).toBe(initialTodos.length + 1);
+                        expect(todos[2].description).toBe(description);
                         done();
                     })
                     .catch(err => done(err));
             });
     });
 
-    it.skip('should not create todo with invalid body data', (done) => {
+    it('should not create todo with invalid body data', (done) => {
         request(app)
             .post('/todos')
+            .set('Auth', this.tokenStr)
             .send({})
             .expect(400)
             .end((err, res) => {
@@ -85,7 +95,7 @@ describe('POST /todos', () => {
 
                 db.todo.findAll({})
                     .then(todos => {
-                        expect(todos.length).toBe(0);
+                        expect(todos.length).toBe(initialTodos.length + 1);
                         done();
                     })
                     .catch(err => done(err));
@@ -93,4 +103,35 @@ describe('POST /todos', () => {
     });
 });
 
+describe('GET /todos:id', () => {
+    it('should return todo doc', (done) => {
+        request(app)
+            .get(`/todos/1`)
+            .set('Auth', this.tokenStr)
+            .expect(200)
+            .expect(res => {
+                console.log(res.body);
+                expect(res.body.description).toBe(initialTodos[0].description);
+            })
+            .end(done);
+    });
+
+    it('should return 404 if todo not found', (done) => {
+        // TODO: generate real id
+
+        request(app)
+            .get(`/todos/xxxx`)
+            .set('Auth', this.tokenStr)
+            .expect(404)
+            .end(done);
+    });
+
+    it('should return 404 for invalid ids', (done) => {
+        request(app)
+            .get(`/todos/123`)
+            .set('Auth', this.tokenStr)
+            .expect(404)
+            .end(done);
+    });
+});
 

@@ -44,6 +44,10 @@ app.get('/todos', middleware.requireAuthentication, async (req, res) => {
 app.get('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
+    if (!Number.isInteger(id) || id < 0) {
+        res.status(404).send();
+    }
+
     try {
         const matchedTodo = await db.todo.findOne({
             where: {

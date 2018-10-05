@@ -1,10 +1,7 @@
 * list of items to do:
-  - ! add tests before refactoring
-  - ! add README.md file
-  - ? move server.js to server folder, db.js to server/db folder, models to server/models
-  - refactor dependencies, some should be moved to dev section
+  - ! move server.js to server folder, db.js to server/db folder, models to server/models
+  - ! add Router and refactor server.js, move all to routes folder
   - generate unique ids (uuid)
-  - use lodash instead of underscore
   - and start script, engines for heroku
   - ? use validator module
-  - use jsonwebtoken
+  - ? use lodash instead of underscore
