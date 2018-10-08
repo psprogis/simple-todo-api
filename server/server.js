@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const _ = require('underscore');
 const bcrypt = require('bcrypt');
 const db = require('./db');
-const middleware = require('./middleware')(db);
+const middleware = require('./middleware/authenticate')(db);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

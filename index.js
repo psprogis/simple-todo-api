@@ -1,6 +1,6 @@
-const db = require('./db');
+const db = require('./server/db');
 
 db.sequelize.sync({ force: true })
     .then(() => {
-        require('./server');
+        require('./server/server');
     });

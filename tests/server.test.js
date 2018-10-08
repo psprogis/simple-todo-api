@@ -1,8 +1,8 @@
 const expect = require('expect');
 const request = require('supertest');
 
-const { app } = require('../server');
-const db = require('../db');
+const { app } = require('../server/server');
+const db = require('../server/db');
 
 const initialTodos = [
     {

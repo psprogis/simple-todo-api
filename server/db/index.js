@@ -1,4 +1,8 @@
 const Sequelize = require('sequelize');
+const path = require('path');
+
+const DB_PATH = path.join(__dirname, './../../data/dev-todo-api.sqlite');
+const MODELS_ROOT = path.join(__dirname, './../models');
 
 const env = process.env.NODE_ENV || 'development';
 let sequelize;
@@ -10,15 +14,14 @@ if (env === 'production') {
 } else {
     sequelize = new Sequelize(null, null, null, {
         dialect: 'sqlite',
-        storage: `${__dirname}/data/dev-todo-api.sqlite`,
+        storage: DB_PATH,
     });
 }
 
 const db = {};
-
-db.todo = sequelize.import(`${__dirname}/models/todo.js`);
-db.user = sequelize.import(`${__dirname}/models/user.js`);
-db.token = sequelize.import(`${__dirname}/models/token.js`);
+db.todo = sequelize.import(`${MODELS_ROOT}/todo`);
+db.user = sequelize.import(`${MODELS_ROOT}/user`);
+db.token = sequelize.import(`${MODELS_ROOT}/token`);
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
