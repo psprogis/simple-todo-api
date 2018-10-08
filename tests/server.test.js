@@ -135,3 +135,66 @@ describe('GET /todos:id', () => {
     });
 });
 
+describe('DELETE /todos/:id', () => {
+
+    it('should remove a todo', (done) => {
+        const todo = initialTodos[0];
+
+        request(app)
+            .delete(`/todos/1`)
+            .set('Auth', this.tokenStr)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.id).toBe(todo.id);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                db.todo.findById(todo.id)
+                    .then(todo => {
+                        expect(todo).toBeFalsy();
+                        done();
+                    })
+                    .catch(e => done(e));
+            });
+    });
+
+    it('should return 404 if todo not found', (done) => {
+        request(app)
+            .delete(`/todos/9999`)
+            .set('Auth', this.tokenStr)
+            .expect(404)
+            .end(done);
+    });
+
+    it('should return 404 if id is invalid', (done) => {
+        request(app)
+            .get(`/todos/sdfaxxxx`)
+            .set('Auth', this.tokenStr)
+            .expect(404)
+            .end(done);
+    });
+});
+
+xdescribe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        const todo = initialTodos[1];
+        const text = 'new text';
+
+        request(app)
+            .put(`/todos/2`)
+            .set('Auth', this.tokenStr)
+            .send({
+                text,
+                completed: true
+            })
+            .expect(200)
+            .expect(res => {
+                expect(res.body.description).toBe(text);
+                expect(res.body.completed).toBe(true);
+            })
+            .end(done);
+    });
+});

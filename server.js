@@ -84,6 +84,10 @@ app.post('/todos', middleware.requireAuthentication, async (req, res) => {
 app.delete('/todos/:id', middleware.requireAuthentication, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
+    if (!Number.isInteger(id) || id < 0) {
+        res.status(404).send();
+    }
+
     try {
         const rowsDeleted = await db.todo.destroy({
             where: {
@@ -95,10 +99,11 @@ app.delete('/todos/:id', middleware.requireAuthentication, async (req, res) => {
         if (rowsDeleted === 0) {
             res.status(404).json({ error: 'no todo found with passed id' });
         } else {
-            res.status(204).send();  // TODO: send deleted item
+            res.status(200).send();  // TODO: send deleted item
         }
 
     } catch (e) {
+        console.log(e);
         res.status(500).send();
     }
 });
