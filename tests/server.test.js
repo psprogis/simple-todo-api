@@ -8,13 +8,13 @@ const initialTodos = [
     {
         description: 'first todo item',
         completed: false,
-        userId: 1
+        userId: 1,
     },
     {
         description: 'second todo item',
         completed: true,
-        userId: 1
-    }
+        userId: 1,
+    },
 ];
 
 before(async () => {

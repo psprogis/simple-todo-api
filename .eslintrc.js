@@ -7,6 +7,7 @@ module.exports = {
     env: {
         es6: true,
         node: true,
+        mocha: true,
     },
 
     parserOptions: {
@@ -23,4 +24,8 @@ module.exports = {
         'no-prototype-builtins': 'warn',
         'func-names': 'off',
     },
+
+    plugins: [
+        'mocha',
+    ],
 };

@@ -6,7 +6,8 @@
     "scripts": {
         "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha tests/**/*.test.js",
         "test-watch": "nodemon --exec 'npm test'",
-        "start": "export NODE_ENV=test || SET \"NODE_ENV=test\" && nodemon index.js"
+        "start": "export NODE_ENV=test || SET \"NODE_ENV=test\" && nodemon index.js",
+        "lint": "./node_modules/.bin/eslint ."
     },
     "author": "",
     "license": "ISC",
@@ -26,8 +27,9 @@
         "eslint": "^5.4.0",
         "eslint-config-airbnb-base": "^13.1.0",
         "eslint-plugin-import": "^2.14.0",
+        "eslint-plugin-mocha": "^5.2.0",
         "expect": "^23.6.0",
-        "supertest": "^3.3.0",
-        "mocha": "^5.2.0"
+        "mocha": "^5.2.0",
+        "supertest": "^3.3.0"
     }
 }
