@@ -1,6 +1,8 @@
 * list of items to do:
   - ! add Router and refactor server.js, move all to routes folder
   - ! add tests for all routes
+  - add error handler
+  - add winston
   - use Joi for validations
   - generate unique ids (uuid)
   - and start script, engines for heroku
